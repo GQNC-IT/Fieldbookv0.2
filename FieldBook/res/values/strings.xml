@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">FieldBook</string>
+    <string name="action_settings">Settings</string>
+    <string name="label_fieldbook">FIELDBOOK</string>
+    <string name="button_submit_login">Login</string>
+    <string name="edit_username"></string>
+    <string name="label_username"> Username </string>
+    <string name="label_password"> Password </string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_display_message">Login Details</string>
+    <string name="title_activity_signup">SignupActivity</string>
+    <string name="button_submit_signup_data">Dont have an account yet? Tap here </string>
+    <string name="label_useridno"> User ID No </string>
+    <string name="edit_useridno"></string>
+    <string name="label_firstname"> First Name </string>
+    <string name="edit_firstname"></string>
+    <string name="label_middlename"> Middle Name </string>
+    <string name="edit_middlename"></string>
+    <string name="label_lastname"> Last Name </string>
+    <string name="edit_lastname"></string>
+    <string name="label_companyid"> Company ID </string>
+    <string name="edit_companyid"></string>
+    <string name="label_orgunitid"> OrgUnit ID </string>
+    <string name="edit_orgunitid"></string>
+    <string name="button_submit_signup">Submit</string>
+    <string name="title_activity_signup_display">SignupDisplayActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="create">Create New Fieldbook</string>
+    <string name="name">Name: </string>
+    <string name="create2">Create</string>
+    <string name="log">Log out</string>
+    <string name="trialTSV">Generate TSV</string>
+    <string name="trialXLS">Generate XLS</string>
+
+    <!-- Action Bar -->
+
+    <string name="action_logout">Logout</string>
+    <string name="action_import_export">Import/Export</string>
+    <string name="action_share">Share</string>
+    <string name="action_check_update">Check Updates</string>
+
+    <!-- Data Collection -->
+    <string name="data_header">Data Collection</string>
+    <string name="data_data">Data</string>
+    <string name="data_property">Property</string>
+    <string name="data_value">Value</string>
+    <string name="data_submit">Submit</string>
+    <string name="data_cancel">Cancel</string>
+
+    <string-array name="data_array">
+        <item>String 1</item>
+        <item>String 2</item>
+        <item>String 3</item>
+        <item>String 4</item>
+        <item>String 5</item>
+        <item>String 6</item>
+        <item>String 7</item>
+        <item>String 8</item>
+    </string-array>
+
+    <string name="title_activity_data_collection">DataCollection</string>
+    <string name="title_activity_login_activty">LoginActivty</string>
+
+</resources>
