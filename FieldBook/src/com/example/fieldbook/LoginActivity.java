@@ -24,6 +24,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -86,6 +87,8 @@ public class LoginActivity extends ActionBarActivity {
 			}
 			
 		}
+		
+		dir = new File("data/data/com.example.fieldbook/databases");
 		File[] filelist = dir.listFiles();
 		String[] namesOfFiles = new String[filelist.length];
 		String temp1;
@@ -96,36 +99,31 @@ public class LoginActivity extends ActionBarActivity {
 		String md5 = "";
 		
 		for (int i = 0; i < namesOfFiles.length; i++) {
-			   temp1 = filelist[i].getName();
-			   
-			  
-			  
-			try {
-				fis = new FileInputStream(new File("data/data/com.example.fieldbook/fieldbooks" + "/" + temp1));
-				md5 = new String(Hex.encodeHex(DigestUtils.md5(temp1)));
-				inTry = true;
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(!(filelist[i].getName().equals("DataObjectDB.db")) && !(filelist[i].getName().endsWith(".db-journal"))){
+				temp1 = filelist[i].getName();
+				   
+				  
+				  
+				try {
+					fis = new FileInputStream(new File("data/data/com.example.fieldbook/databases" + "/" + temp1));
+					md5 = new String(Hex.encodeHex(DigestUtils.md5(temp1)));
+					inTry = true;
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		 
+				   namesOfFiles[i] = temp1.replaceAll(".db$","");
+
+				   item = new HashMap<String,String>();
+				   item.put( "line1", namesOfFiles[i]);
+				   item.put( "line2", md5);
+				   list.add( item );
+
+				   inTry = false;
 			}
 			   
-			   
-			   namesOfFiles[i] = temp1.replaceAll(".db$","");
-			  // if(inTry){
-			//	   namesOfFiles[i] = namesOfFiles[i] + "\n" + md5;
-			  // }
-			   
-			   item = new HashMap<String,String>();
-			   item.put( "line1", namesOfFiles[i]);
-			   item.put( "line2", md5);
-			   list.add( item );
 
-			   
-			   
-			   inTry = false;
-			   //datum.put("First Line",namesOfFiles[i]);
-			   //datum.put("Second Line",md5);
-			   //data.add(datum);
 		}
 		
 		
@@ -160,10 +158,13 @@ public class LoginActivity extends ActionBarActivity {
 		listView.setOnItemClickListener(new OnItemClickListener(){
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-			Toast.makeText(getApplicationContext(),
+			/*Toast.makeText(getApplicationContext(),
 	                 "Item clicked", Toast.LENGTH_LONG)
-	                 .show();
-			goDataCollection();
+	                 .show();*/
+			TextView textView = (TextView) view.findViewById(R.id.line_a);
+            String itemValue = (String) textView.getText();
+            
+			goDataCollection(itemValue);
 			}
 	
 		});
@@ -199,8 +200,9 @@ public class LoginActivity extends ActionBarActivity {
 	}
 	
 	
-	public void goDataCollection(){
+	public void goDataCollection(String dbname){
 		Intent intent = new Intent(this, DataCollection.class);
+		intent.putExtra("dbName", dbname);
 		startActivity(intent);
 		
 	}
@@ -233,8 +235,8 @@ public class LoginActivity extends ActionBarActivity {
 	}
 	
 	public void reNaming(String oldstring, String newstring){
-		File file = new File("data/data/com.example.fieldbook/fieldbooks/" + oldstring + ".db");
-		File file2 = new File("data/data/com.example.fieldbook/fieldbooks/" + newstring + ".db");
+		File file = new File("data/data/com.example.fieldbook/databases/" + oldstring + ".db");
+		File file2 = new File("data/data/com.example.fieldbook/databases/" + newstring + ".db");
 		boolean success = file.renameTo(file2);
 		if(success){
 			Toast.makeText(getApplicationContext(),
@@ -258,7 +260,7 @@ public class LoginActivity extends ActionBarActivity {
 		builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 			  String value = input.getText().toString();
-			  File file = new File("data/data/com.example.fieldbook/fieldbooks/" + value + ".db");
+			  File file = new File("data/data/com.example.fieldbook/databases/" + value + ".db");
 			  try {
 				if (file.createNewFile()){
 				        System.out.println("File is created!");

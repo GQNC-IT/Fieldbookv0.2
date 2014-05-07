@@ -54,7 +54,7 @@ public class MySQLiteUserHelper extends SQLiteOpenHelper {
                 " MiddleName TEXT ,"+
                 " LastName TEXT ,"+
                 " OrgUnitID TEXT ,"+
-                " SeqID INTEGER KEY AUTO_INCREMENT "+
+                " SeqID INTEGER AUTO_INCREMENT "+
                 " )";
   
         this.db1 = db; 
@@ -81,6 +81,7 @@ public class MySQLiteUserHelper extends SQLiteOpenHelper {
 
     	// 1. get reference to writable DB
     	SQLiteDatabase db = this.getWritableDatabase();
+    	
     	Log.i("TRACE", "umabot dito");
     	// 2. create ContentValues to add key "column"/value
     	ContentValues values = new ContentValues();

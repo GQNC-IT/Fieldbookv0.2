@@ -28,7 +28,7 @@ public class MySQLiteOutlierDataHelper extends SQLiteOpenHelper {
 	@Override
     public void onCreate(SQLiteDatabase db) {     
         // SQL statement to create OutlierData table
-        String CREATE_OUTLIERDATA_TABLE = "CREATE TABLE OutlierData ( " +
+        String CREATE_OUTLIERDATA_TABLE = "CREATE TABLE if not exists OutlierData ( " +
                 "OUTLIERDATA_PROPERTYMETHODASSNID TEXT PRIMARY KEY, " + 
                 "OUTLIERDATA_VALIDATIONID TEXT, "+
                 "OUTLIERDATA_VALUE TEXT," +

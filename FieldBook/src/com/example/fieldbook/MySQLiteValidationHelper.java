@@ -31,7 +31,7 @@ public class MySQLiteValidationHelper extends SQLiteOpenHelper {
 	@Override
     public void onCreate(SQLiteDatabase db) {     
 		// SQL statement to create Validation table
-        String CREATE_VALIDATION_TABLE = "CREATE TABLE Validation ( " +
+        String CREATE_VALIDATION_TABLE = "CREATE TABLE if not exists Validation ( " +
                 "VALIDATION_VALIDATIONID TEXT PRIMARY KEY, " + 
                 "VALIDATION_VALIDATIONDESCRIPTION TEXT, "+
                 "VALIDATION_VALIDATIONTYPE TEXT," +

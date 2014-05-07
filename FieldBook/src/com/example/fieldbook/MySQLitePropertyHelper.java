@@ -29,7 +29,7 @@ public class MySQLitePropertyHelper extends SQLiteOpenHelper {
 	@Override
     public void onCreate(SQLiteDatabase db) {     
 		// SQL statement to create Property table
-        String CREATE_PROPERTY_TABLE = "CREATE TABLE Property ( " +
+        String CREATE_PROPERTY_TABLE = "CREATE TABLE if not exists Property ( " +
                 "PROPERTY_PROPERTYID TEXT PRIMARY KEY, " + 
                 "PROPERTY_PROPERTYDESCRIPTION TEXT, "+
                 "PROPERTY_ACTIVE," +
