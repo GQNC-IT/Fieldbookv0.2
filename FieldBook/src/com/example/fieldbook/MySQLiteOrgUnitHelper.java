@@ -29,7 +29,7 @@ public class MySQLiteOrgUnitHelper extends SQLiteOpenHelper {
 	@Override
     public void onCreate(SQLiteDatabase db) {     
 		// SQL statement to create OrgUnit table
-        String CREATE_ORGUNIT_TABLE = "CREATE TABLE if not exists OrgUnit( " +
+        String CREATE_ORGUNIT_TABLE = "CREATE TABLE OrgUnit( " +
                 "ORGUNIT_ORGUNITID TEXT PRIMARY KEY, " + 
                 "ORGUNIT_DESCRIPTION TEXT, "+
                 "ORGUNIT_ORGUNITABBR TEXT," +

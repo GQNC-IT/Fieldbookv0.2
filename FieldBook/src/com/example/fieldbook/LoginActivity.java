@@ -24,12 +24,17 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.bluetooth.BluetoothAdapter;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -50,6 +55,13 @@ import android.widget.TextView;
 import android.widget.Toast;
   
 public class LoginActivity extends ActionBarActivity {
+	
+	private static final int DISCOVER_DURATION = 300;
+	private static final int REQUEST_BLU = 1;
+	public File fp = new File(Environment.getExternalStorageDirectory().getPath() + "/excelfiles", "sampleDB.xls");
+	String[] databaseNames;
+	static Context context;
+	
 	boolean inTry;
 	 FileInputStream fis;
 	List<Map<String,String>> data = new ArrayList<Map<String,String>>();
@@ -63,6 +75,7 @@ public class LoginActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_login);
+		context = this;
 		loadActivity();
 		
 		
@@ -73,7 +86,6 @@ public class LoginActivity extends ActionBarActivity {
 	}
 
 	public void loadActivity(){
-		
 		
 		File dir = new File("data/data/com.example.fieldbook/fieldbooks"); //Not dynamic yet
 		if(!(dir.isDirectory())){
@@ -87,10 +99,9 @@ public class LoginActivity extends ActionBarActivity {
 			}
 			
 		}
-		
-		dir = new File("data/data/com.example.fieldbook/databases");
 		File[] filelist = dir.listFiles();
 		String[] namesOfFiles = new String[filelist.length];
+		this.databaseNames =  new String[filelist.length];
 		String temp1;
 		
 		HashMap<String,String> item;
@@ -99,31 +110,36 @@ public class LoginActivity extends ActionBarActivity {
 		String md5 = "";
 		
 		for (int i = 0; i < namesOfFiles.length; i++) {
-			if(!(filelist[i].getName().equals("DataObjectDB.db")) && !(filelist[i].getName().endsWith(".db-journal"))){
-				temp1 = filelist[i].getName();
-				   
-				  
-				  
-				try {
-					fis = new FileInputStream(new File("data/data/com.example.fieldbook/databases" + "/" + temp1));
-					md5 = new String(Hex.encodeHex(DigestUtils.md5(temp1)));
-					inTry = true;
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		 
-				   namesOfFiles[i] = temp1.replaceAll(".db$","");
-
-				   item = new HashMap<String,String>();
-				   item.put( "line1", namesOfFiles[i]);
-				   item.put( "line2", md5);
-				   list.add( item );
-
-				   inTry = false;
+			   temp1 = filelist[i].getName();
+			   databaseNames[i] = filelist[i].getName();
+			  
+			  
+			try {
+				fis = new FileInputStream(new File("data/data/com.example.fieldbook/fieldbooks" + "/" + temp1));
+				md5 = new String(Hex.encodeHex(DigestUtils.md5(temp1)));
+				inTry = true;
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			   
+			   
+			   namesOfFiles[i] = temp1.replaceAll(".db$","");
+			  // if(inTry){
+			//	   namesOfFiles[i] = namesOfFiles[i] + "\n" + md5;
+			  // }
+			   
+			   item = new HashMap<String,String>();
+			   item.put( "line1", namesOfFiles[i]);
+			   item.put( "line2", md5);
+			   list.add( item );
 
+			   
+			   
+			   inTry = false;
+			   //datum.put("First Line",namesOfFiles[i]);
+			   //datum.put("Second Line",md5);
+			   //data.add(datum);
 		}
 		
 		
@@ -134,37 +150,14 @@ public class LoginActivity extends ActionBarActivity {
 		new String[] { "line1","line2" },
 		new int[] {R.id.line_a, R.id.line_b});
 		listView.setAdapter( sa );
-		//listView.setTextAlignment(4);
-
-		
-		
-		
-		//String[] values = new String[]{"A","B","C","D","E","F"};
-		
-		//int a = 1;
-		/*for (a = 1; a < values.length; a++){
-			values[a-1] = "Fieldbook" + a;
-			
-		}*/
-		
-		//ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,android.R.id.text1, namesOfFiles){};
-
-		
-
-		//listView.setAdapter(adapter);
-		
-		
 		
 		listView.setOnItemClickListener(new OnItemClickListener(){
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-			/*Toast.makeText(getApplicationContext(),
+			Toast.makeText(getApplicationContext(),
 	                 "Item clicked", Toast.LENGTH_LONG)
-	                 .show();*/
-			TextView textView = (TextView) view.findViewById(R.id.line_a);
-            String itemValue = (String) textView.getText();
-            
-			goDataCollection(itemValue);
+	                 .show();
+			goDataCollection();
 			}
 	
 		});
@@ -176,13 +169,6 @@ public class LoginActivity extends ActionBarActivity {
            //  @Override
              public boolean onItemLongClick(AdapterView<?> parent, View view,
                 int position, long id) {
-               
-              // ListView Clicked item index
-              //int itemPosition     = position;
-              
-              // ListView Clicked item value
-             //	 TextView clickedView = (TextView) view;
-            //	 String itemValue = (String) clickedView.getText();
              TextView textView = (TextView) view.findViewById(R.id.line_a);
              String itemValue = (String) textView.getText();
              //String  itemValue    = (String) listView.getItemAtPosition(position);
@@ -200,9 +186,8 @@ public class LoginActivity extends ActionBarActivity {
 	}
 	
 	
-	public void goDataCollection(String dbname){
+	public void goDataCollection(){
 		Intent intent = new Intent(this, DataCollection.class);
-		intent.putExtra("dbName", dbname);
 		startActivity(intent);
 		
 	}
@@ -235,8 +220,8 @@ public class LoginActivity extends ActionBarActivity {
 	}
 	
 	public void reNaming(String oldstring, String newstring){
-		File file = new File("data/data/com.example.fieldbook/databases/" + oldstring + ".db");
-		File file2 = new File("data/data/com.example.fieldbook/databases/" + newstring + ".db");
+		File file = new File("data/data/com.example.fieldbook/fieldbooks/" + oldstring + ".db");
+		File file2 = new File("data/data/com.example.fieldbook/fieldbooks/" + newstring + ".db");
 		boolean success = file.renameTo(file2);
 		if(success){
 			Toast.makeText(getApplicationContext(),
@@ -260,7 +245,7 @@ public class LoginActivity extends ActionBarActivity {
 		builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 			  String value = input.getText().toString();
-			  File file = new File("data/data/com.example.fieldbook/databases/" + value + ".db");
+			  File file = new File("data/data/com.example.fieldbook/fieldbooks/" + value + ".db");
 			  try {
 				if (file.createNewFile()){
 				        System.out.println("File is created!");
@@ -283,8 +268,6 @@ public class LoginActivity extends ActionBarActivity {
 	
 	public void generateXLS(View view){
 		
-		Toast toast = Toast.makeText(getApplicationContext(), "Excel file has been made", Toast.LENGTH_SHORT);
-		toast.show();
 		String sdCard = Environment.getExternalStorageDirectory().getPath();
 		File directory = new File (sdCard + "/excelfiles");
 		
@@ -292,17 +275,36 @@ public class LoginActivity extends ActionBarActivity {
 		
 		directory.mkdirs();
 		
+		
+		final String [] items = this.databaseNames;
+		AlertDialog.Builder builder=new AlertDialog.Builder(this);
+		builder.setTitle("Which to share?");
+		
+		builder.setItems(items, new OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				String sdCard = Environment.getExternalStorageDirectory().getPath();
+				File directory = new File (sdCard + "/BTFiles");	
+				String extended = databaseNames[which];
+				String[] filename = extended.split(".");
+				fileSetter(directory, filename[0]+".xls");
+				Toast.makeText(null, "File set", Toast.LENGTH_SHORT).show();
+			}
+		});
+
+		builder.show();
+		
 		MySQLiteUserHelper dbHelper = new MySQLiteUserHelper(this);
-		SQLiteDatabase db = openOrCreateDatabase("UserDB.db", MODE_PRIVATE, null);
+		SQLiteDatabase db = openOrCreateDatabase("puta.db", MODE_PRIVATE, null);
 		Cursor cursor = db.rawQuery("select * from users", null);
-	//	int rowCount = cursor.getCount();
+		//	int rowCount = cursor.getCount();
 		if(cursor != null)
 			cursor.moveToFirst();
 		
 		String[] colHeads = dbHelper.getColHeads(); 
 		
+		
 		try{
-			WritableWorkbook workbook = Workbook.createWorkbook(new File(directory, "ExcelFile-0.1.xls"));
+			WritableWorkbook workbook = Workbook.createWorkbook(this.fp);
 			WritableSheet worksheet = workbook.createSheet("users", 0);
 			int colCount = cursor.getColumnCount();
 			for(int i = 0; i < colCount; i++){
@@ -326,10 +328,12 @@ public class LoginActivity extends ActionBarActivity {
 			cursor.close();
 			workbook.write();
 			workbook.close();
-			
+			Toast toast = Toast.makeText(getApplicationContext(), "Excel file has been made", Toast.LENGTH_SHORT);
+			toast.show();
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+		
 	}
 	
 	public void generateTSV(View view){
@@ -341,17 +345,34 @@ public class LoginActivity extends ActionBarActivity {
 		
 		directory.mkdirs();
 		
+		final String [] items = this.databaseNames;
+		AlertDialog.Builder builder=new AlertDialog.Builder(this);
+		builder.setTitle("Which to share?");
+		
+		builder.setItems(items, new OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				String sdCard = Environment.getExternalStorageDirectory().getPath();
+				File directory = new File (sdCard + "/BTFiles");		
+				String extended = databaseNames[which];
+				String[] filename = extended.split(".");
+				fileSetter(directory, filename[0]+".tsv");
+				Toast.makeText(null, "File set", Toast.LENGTH_SHORT).show();
+			}
+		});
+
+		builder.show();
+		
 		MySQLiteUserHelper dbHelper = new MySQLiteUserHelper(this);
-		SQLiteDatabase db = openOrCreateDatabase("UserDB.db", MODE_PRIVATE, null);
+		SQLiteDatabase db = openOrCreateDatabase(fp.getName(), MODE_PRIVATE, null);
 		Cursor cursor = db.rawQuery("select * from users", null);
 //		int rowCount = cursor.getCount();
 		if(cursor != null)
 			cursor.moveToFirst();
 		
 		String[] colHeads = dbHelper.getColHeads(); 
-		
+				
 		try{
-			File tsvFile = new File(directory, "TSVFile-0.1.txt");
+			File tsvFile = this.fp;
 			BufferedWriter bw = new BufferedWriter(new FileWriter(tsvFile));
 			
 			int colCount = cursor.getColumnCount();
@@ -376,6 +397,157 @@ public class LoginActivity extends ActionBarActivity {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+	
+	public void fileSetter(File directory, String filename){
+		this.fp = new File(directory, filename); 
+	}
+	
+	public void transferBT(View view){
+		BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+		if (btAdapter == null) {
+			Toast.makeText(this, "Bluetooth is not supported", Toast.LENGTH_LONG).show();
+		}
+		else{
+			// bring up Android chooser
+			
+			
+			final String [] items=new String []{"Excel","Tab Separated File", "Database File"};
+			AlertDialog.Builder builder=new AlertDialog.Builder(this);
+			builder.setTitle("Which to share?");
+			
+			builder.setItems(items, new OnClickListener() {
+
+			public void onClick(DialogInterface dialog, int which) {
+				String sdCard = Environment.getExternalStorageDirectory().getPath();
+				File directory = new File (sdCard + "/BTFiles");		
+				
+				if(which == 0){
+					fileSetter(directory, "ExcelFile-0.1.xls");
+				}
+				else if(which == 1){
+					fileSetter(directory, "TSVFile-0.1.tsv");
+				}
+				else if(which == 2){
+					fileSetter(directory, "Fieldbook 1.db");
+				}
+			}
+			});
+
+			builder.show();
+			
+			Intent intent = new Intent();
+			intent.setAction(Intent.ACTION_SEND);
+			intent.setType("application/pdf");
+			intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(fp));
+			//...
+			//list of apps that can handle our intent
+			PackageManager pm = getPackageManager();
+			List<ResolveInfo> appsList = pm.queryIntentActivities(intent, 0);
+			if(appsList.size() > 0) {
+			// proceed
+				//select bluetooth
+				String packageName = null;
+				String className = null;
+				boolean found = false;
+				for(ResolveInfo info: appsList){
+					packageName = info.activityInfo.packageName;
+					Toast.makeText(this, packageName, Toast.LENGTH_SHORT).show();
+					if(packageName.equals("com.mediatek.bluetooth") || packageName.equals("com.android.bluetooth")){
+						className = info.activityInfo.name;
+						found = true;
+						break;// found
+					}
+				}
+				if(!found){
+					Toast.makeText(this, "Apps not found",Toast.LENGTH_SHORT).show();
+					//enableBlu();
+				}
+				else{
+					Toast.makeText(this, "Starting intent...", Toast.LENGTH_LONG).show();
+					intent.setClassName(packageName, className);
+					startActivity(intent);
+					/*
+					ContentValues values = new ContentValues();
+					values.put(BluetoothShare.URI, "content://"+Uri.fromFile(file));
+					values.put(BluetoothShare.DESTINATION, value);
+					*/
+					
+				}
+			}
+			else{
+				Toast.makeText(this, "Applist empty", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "Sharing terminated", Toast.LENGTH_LONG).show();
+			}
+			
+		}
+	}
+	
+	public void enableBlu(){
+		// enable device discovery - this will automatically enable Bluetooth
+		Intent discoveryIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+		discoveryIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, DISCOVER_DURATION);
+		startActivityForResult(discoveryIntent, REQUEST_BLU);
+	}
+	
+	protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+		if (resultCode == DISCOVER_DURATION	&& requestCode == REQUEST_BLU) {
+			// processing code goes here
+			Toast.makeText(this, "SENDING FILE", Toast.LENGTH_SHORT).show();
+		}
+		else{ // cancelled or error
+			Toast.makeText(this, "Sharing cancelled", Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	public void sendEmail(View view){
+		//Intent emailIntent = new Intent(this, EmailActivity.class);
+		//startActivity(emailIntent);
+		final Intent emailIntent = new Intent(Intent.ACTION_SEND);
+		emailIntent.setData(Uri.parse("mailto:"));
+		emailIntent.setType("text/plain");
+		AlertDialog.Builder popUp1 = new AlertDialog.Builder(this);
+		LayoutInflater inflater = this.getLayoutInflater();
+		popUp1.setView(inflater.inflate(R.layout.pop_up_layout, null));
+		popUp1.setPositiveButton("Send", new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int id) {
+//	        	   EditText toET = (EditText) findViewById(R.id.to);
+	        	   //String to = toET.getText().toString();
+	        	   //String from = findViewById(R.id.from).toString();	// to be fetched from user db as user's eadd
+/*	        	   
+	        	   MySQLiteUserHelper dbHelper = new MySQLiteUserHelper(LoginActivity.context);
+	        	   SQLiteDatabase db = openOrCreateDatabase("puta.db", MODE_PRIVATE, null);
+	        	   Cursor cursor = db.rawQuery("select * from users", null);
+*/	        	   
+	        	   String from = "jeobmallari@gmail.com";
+//	        	   EditText bodyET = (EditText) findViewById(R.id.body);
+	        	   //String body = bodyET.getText().toString();
+	        	   String body = "";	// email body
+//	        	   EditText subjET = (EditText) findViewById(R.id.subject);
+	        	   //String subject = subjET.getText().toString();
+	        	   String subject = "";			// email subject
+	               emailIntent.putExtra(Intent.EXTRA_EMAIL, from);
+	               emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+	               emailIntent.putExtra(Intent.EXTRA_TEXT, body);
+	               
+	               try{
+	            	   startActivity(Intent.createChooser(emailIntent, "Choose an option:"));
+	            	   finish();
+	            	   Log.i("Finished sending Email.", "");
+	               }catch(ActivityNotFoundException e){
+	            	   Toast.makeText(null, "Cannot find installed email client", Toast.LENGTH_SHORT).show();
+	               }catch(Exception e){
+	            	   Toast.makeText(null, "Some other error occured", Toast.LENGTH_SHORT).show();
+	               }
+	           }
+	       });
+		popUp1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int id) {
+	               // User cancelled the dialog
+	           }
+	       });
+		AlertDialog alertDialog = popUp1.create();
+		alertDialog.show();
 	}
 	
 	public void reappear(){
@@ -403,7 +575,7 @@ public class LoginActivity extends ActionBarActivity {
 	//	int id = item.getItemId();
 		switch (item.getItemId()) {
 		case R.id.action_share:
-			final String [] items=new String []{"Excel","Tab Separated File"};
+			final String [] items=new String []{"Excel","Tab Separated File", "Bluetooth", "Email"};
 			AlertDialog.Builder builder=new AlertDialog.Builder(this);
 			builder.setTitle("Items alert");
 
@@ -417,6 +589,12 @@ public class LoginActivity extends ActionBarActivity {
 				}
 				else if(which == 1){
 					generateTSV(new View(getApplicationContext()));
+				}
+				else if(which == 2){
+					transferBT(new View(getApplicationContext()));
+				}
+				else if(which == 3){
+					sendEmail(new View(getApplicationContext()));
 				}
 			}
 			});

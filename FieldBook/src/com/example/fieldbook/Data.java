@@ -2,124 +2,125 @@ package com.example.fieldbook;
 
 public class Data {
 	
-	private static String DataID; //PK string
-    private static String PropertyMethodAssnID;//int muna
-    private static String Value;//fromuserinpu
-    private static String UserIDNo;//a
-    private static String DateTime;//kuin
-    private static String DeviceID;//wagmuna
-    private static String Longitude;//rand
-    private static String Latitude;//rand
-    private static String Active;//1
-    private static String Blocked;//0
-    private static int SeqID; //autoinc
+	private String DataID;
+    private String PropertyMethodAssnID;
+    private String Value;
+    private String UserIDNo;
+    private String DateTime;
+    private String DeviceID;
+    private String Longitude;
+    private String Latitude;
+    private String Active;
+    private String Blocked;
+    private int SeqID;
     
 	public Data() {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Data(String DataID2, String PropertyMethodAssnID2, String Value2, String UserIDNo2,  
-			String DeviceID2, String Longitude2, String Latitude2, String Active2, String Blocked2, int SeqID2) {
+	public Data(String DataID, String PropertyMethodAssnID, String Value, String UserIDNo, String DateTime, 
+			String DeviceID, String Longitude, String Latitude, String Active, String Blocked, int SeqID) {
     super();
-    DataID = DataID2;
-    PropertyMethodAssnID = PropertyMethodAssnID2;
-    Value = Value2;
-    UserIDNo = UserIDNo2;
-    DeviceID = DeviceID2;
-    Longitude = Longitude2;
-    Latitude = Latitude2;  
-    Active = Active2;
-    Blocked = Blocked2;
-    SeqID = SeqID2;
+    this.DataID = DataID;
+    this.PropertyMethodAssnID = PropertyMethodAssnID;
+    this.Value = Value;
+    this.UserIDNo = UserIDNo;
+    this.DateTime = DateTime;
+    this.DeviceID = DeviceID;
+    this.Longitude = Longitude;
+    this.Latitude = Latitude;  
+    this.Active = Active;
+    this.Blocked = Blocked;
+    this.SeqID = SeqID;
 }
 
 	//getters & setters
-	public static String getDataID() {
+	public String getDataID() {
 		return DataID;
 	}
 
-	public void setDataID(String DataID2) {
-		DataID = DataID2;
+	public void setDataID(String DataID) {
+		this.DataID = DataID;
 	}
 
-	public static String getPropertyMethodAssnID() {
+	public String getPropertyMethodAssnID() {
 		return PropertyMethodAssnID;
 	}
 
-	public void setPropertyMethodAssnID(String PropertyMethodAssnID2) {
-		PropertyMethodAssnID = PropertyMethodAssnID2;
+	public void setPropertyMethodAssnID(String PropertyMethodAssnID) {
+		this.PropertyMethodAssnID = PropertyMethodAssnID;
 	}
       
-	public static String getValue() {
+	public String getValue() {
 		return Value;
 	}
 
-	public void setValue(String Value2) {
-		Value = Value2;
+	public void setValue(String Value) {
+		this.Value = Value;
 	}
       
-	public static String getUserIDNo() {
+	public String getUserIDNo() {
 		return UserIDNo;
 	}
 
-	public void setUserIDNo(String UserIDNo2) {
-		UserIDNo = UserIDNo2;
+	public void setUserIDNo(String UserIDNo) {
+		this.UserIDNo = UserIDNo;
 	}
       
-	public static String getDateTime() {
+	public String getDateTime() {
 		return DateTime;
 	}
 
-	public void setDateTime(String DateTime2) {
-		DateTime = DateTime2;
+	public void setDateTime(String DateTime) {
+		this.DateTime = DateTime;
 	}
         
-	public static String getDeviceID(){
+	public String getDeviceID(){
 		return DeviceID;
 	}
 
-	public void setDeviceID(String DeviceID2) {
-		DeviceID = DeviceID2;
+	public void setDeviceID(String DeviceID) {
+		this.DeviceID = DeviceID;
 	}
       
-	public static String getLongitude() {
+	public String getLongitude() {
 		return Longitude;
 	}
 
-	public void setLongitude(String Longitude2) {
-		Longitude = Longitude2;
+	public void setLongitude(String Longitude) {
+		this.Longitude = Longitude;
 	}
       
-	public static String getLatitude() {
+	public String getLatitude() {
 		return Latitude;
 	}
 
-	public void setLatitude(String Latitude2) {
-		Latitude = Latitude2;
+	public void setLatitude(String Latitude) {
+		this.Latitude = Latitude;
 	}
 
-	public static String getActive() {
+	public String getActive() {
 		return Active;
 	}
 
-	public void setActive(String Active2) {
-		Active = Active2;
+	public void setActive(String Active) {
+		this.Active = Active;
 	}
       
-	public static String getBlocked() {
+	public String getBlocked() {
 		return Blocked;
 	}
 
-	public void setBlocked(String Blocked2) {
-		Blocked = Blocked2;
+	public void setBlocked(String Blocked) {
+		this.Blocked = Blocked;
 	}
 
-	public static int getSeqID() {
+	public int getSeqID() {
 		return SeqID;
 	}
 
-	public void setSeqID(int SeqID2) {
-		SeqID = SeqID2;
+	public void setSeqID(int SeqID) {
+		this.SeqID = SeqID;
 	}
  
     @Override

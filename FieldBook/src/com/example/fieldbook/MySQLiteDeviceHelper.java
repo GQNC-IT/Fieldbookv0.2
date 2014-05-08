@@ -28,7 +28,7 @@ public class MySQLiteDeviceHelper extends SQLiteOpenHelper {
 	@Override
     public void onCreate(SQLiteDatabase db) {     
 		// SQL statement to create Device table
-        String CREATE_DEVICE_TABLE = "CREATE TABLE if not exists Device ( " +
+        String CREATE_DEVICE_TABLE = "CREATE TABLE Device ( " +
                 "DEVICE_DEVICEID TEXT PRIMARY KEY, " + 
                 "DEVICE_DEVICEDESCRIPTION TEXT, "+
                 "DEVICE_ACTIVE TEXT," +

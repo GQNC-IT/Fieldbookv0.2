@@ -28,7 +28,7 @@ public class MySQLiteMethodHelper extends SQLiteOpenHelper {
 	@Override
     public void onCreate(SQLiteDatabase db) {     
 		// SQL statement to create Method table
-        String CREATE_METHOD_TABLE = "CREATE TABLE if not exists Method ( " +
+        String CREATE_METHOD_TABLE = "CREATE TABLE Method ( " +
                 "METHOD_METHODID TEXT PRIMARY KEY, " + 
                 "METHOD_METHODDESCRIPTION TEXT, "+
                 "METHOD_ACTIVE TEXT," +

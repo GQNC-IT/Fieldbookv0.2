@@ -62,5 +62,6 @@
 
     <string name="title_activity_data_collection">DataCollection</string>
     <string name="title_activity_login_activty">LoginActivty</string>
+    <string name="title_activity_email">Compose Mail</string>
 
 </resources>
