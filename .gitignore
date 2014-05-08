@@ -213,3 +213,5 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+FieldBook/gen/android/support/v7/appcompat/R.java
+FieldBook/gen/com/example/fieldbook/BuildConfig.java
