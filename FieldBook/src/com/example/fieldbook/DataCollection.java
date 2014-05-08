@@ -1,10 +1,9 @@
 package com.example.fieldbook;
 
-import java.io.File;
-import java.util.Date;
+import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,6 +27,7 @@ public class DataCollection extends ActionBarActivity {
 	Spinner spinner1;
 	DatabaseHelper db;
 	String dbName;
+	String username;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +36,10 @@ public class DataCollection extends ActionBarActivity {
 		Intent intent = getIntent();
 		
 		dbName = intent.getStringExtra("dbName");
+		username = intent.getStringExtra("username");
 		
 				Toast.makeText(getApplicationContext(),
-	                dbName, Toast.LENGTH_LONG)
+	                username, Toast.LENGTH_LONG)
 	                .show();
 		db = new DatabaseHelper(this, dbName);
 		db.createTables();
@@ -91,23 +92,74 @@ public class DataCollection extends ActionBarActivity {
 		dropdownValue = String.valueOf(dropdown.getSelectedItem());
 		dataValue = data.getText().toString();
 		valueValue = value.getText().toString();
+		String validID = "";
+		String[] validValues;
+		String valuesValidation = "";
+		boolean validCheck = false;
+		int ratioCheck = 0;
+		int[] ratioArray = new int[2];
+		int parseValueInput = 1;
 		
+		Date date = new Date();
 		
 		try{//adding the new user info
 	    	
 	    	Log.i("TRACE", "umabot dito");
 	    	int dataCount = db.countData() + 1;
-
-	    	db.insertIntoData(new Data(dataValue,"1",valueValue,"1","a","b","c","1","0",dataCount));
-	    }catch(Exception e){
+	    	String userID = db2.getIDNoFromUsername(username);
+	    	
+	    	Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    	String dateString = formatter.format(date);
+	    	
+	    	validID = db.findValidationIDFromPMA(dropdownValue);
+	    	validValues = db.getPossibleValues(validID);
+	    	valuesValidation = db.findValidationType(validID);	
+	    	
+	    	if(valuesValidation.equals("categorical")){
+	    		for(String singleCheck: validValues){
+	    			if(singleCheck.equals(valueValue)){
+	    				validCheck = true;
+	    			}
+	    		}
+	    	}
+	    	
+	    	else if(valuesValidation.equals("ratio")){
+	    		for(String singleCheck: validValues){
+	    			if(ratioCheck == 0){
+	    				ratioArray[0] = Integer.parseInt(singleCheck);
+	    			}
+	    			else if(ratioCheck > 0){
+	    				ratioArray[1] = Integer.parseInt(singleCheck);
+	    			}
+	    			ratioCheck++;
+	    		}
+	    		parseValueInput = Integer.parseInt(valueValue);
+	    	
+	    		if(parseValueInput >= ratioArray[0] && parseValueInput <= ratioArray[1]){
+	    			validCheck = true;
+	    		}
+	    		
+	    	}
+    	
+	    	if(validCheck){
+	    		db.insertIntoData(new Data(dataValue,dropdownValue,valueValue,userID,dateString,"a","b","c","1","0",dataCount));
+	    		Toast.makeText(getApplicationContext(),
+	                    "Data: " + dataValue + "\nProperty: " + dropdownValue + "\nValue: " + valueValue, Toast.LENGTH_LONG)
+	                    .show();
+	    	}
+	    	else{
+	    		Toast.makeText(getApplicationContext(),
+	                    "Invalid value.", Toast.LENGTH_LONG)
+	                    .show();
+	    	}
+	    	Log.i("TRACE", "please");
+		}catch(Exception e){
 	    	e.printStackTrace();
 	    }
 		
 		
 		
-		Toast.makeText(getApplicationContext(),
-                "Data: " + dataValue + "\nProperty: " + dropdownValue + "\nValue: " + valueValue, Toast.LENGTH_LONG)
-                .show();
+		
 	}
 
 	@Override

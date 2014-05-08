@@ -113,7 +113,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     		+ KEY_PMAID + " TEXT," 
     		+ KEY_VALUE + " TEXT," 
     		+ KEY_USERIDNO + " TEXT," 
-    		+ KEY_DATETIME + " DATETIME DEFAULT CURRENT_TIMESTAMP,"
+    		+ KEY_DATETIME + " TEXT,"
     		+ KEY_DEVICEID + " TEXT,"
     		+ KEY_LONGITUDE + " TEXT,"
     		+ KEY_LATITUDE + " TEXT,"
@@ -244,7 +244,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         db.execSQL(CREATE_TABLE_OUTLIERDATA);
         db.execSQL(CREATE_TABLE_USER);
   
-        //createDummyProperties(db);
+        createDummyProperties(db);
         Log.d("Creating tables","createTables()");
     	
     }
@@ -314,8 +314,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
     
     public void insertIntoProperty(Property property,SQLiteDatabase db){
-    	//SQLiteDatabase db = this.getWritableDatabase();
-    	
     	
     	ContentValues values = new ContentValues();
 		values.put(KEY_PROPERTYID, Property.getPropertyID());
@@ -326,32 +324,157 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		db.insert(TABLE_PROPERTY, // table
 		        null, //nullColumnHack
 		        values); // key/value -> keys = column names/ values = column values
+
+    }
+    
+    public void insertIntoPMA(PropertyMethodAssn pma, SQLiteDatabase db){
+    	ContentValues values = new ContentValues();
+		values.put(KEY_PMAID, pma.getPropertyMethodAssnID());
+		values.put(KEY_PROPERTYID, pma.getPropertyID());
+		values.put(KEY_METHODID, pma.getMethodID());
+		values.put(KEY_VALIDATIONID, pma.getValidationID());
+		values.put(KEY_SEQID, pma.getSeqID());
+		
+		db.insert(TABLE_PMA, // table
+		        null, //nullColumnHack
+		        values); // key/value -> keys = column names/ values = column values
     	
-		// 4. close
-	
+    }
+    
+    public void insertIntoMethod(Method method, SQLiteDatabase db){
+    	ContentValues values = new ContentValues();
+		values.put(KEY_METHODID, method.getMethodID());
+		values.put(KEY_METHOD_DESCRIPTION, method.getMethodDescription());
+		values.put(KEY_ACTIVE, method.getActive());
+		values.put(KEY_SEQID, method.getSeqID());
+		
+		
+		db.insert(TABLE_METHOD, // table
+		        null, //nullColumnHack
+		        values); // key/value -> keys = column names/ values = column values
+    	
+    }
+    
+    public void insertIntoValidation(Validation validation, SQLiteDatabase db){
+    	ContentValues values = new ContentValues();
+		values.put(KEY_VALIDATIONID, validation.getValidationID());
+		values.put(KEY_VALIDATION_DESCRIPTION, validation.getValidationDescription());
+		values.put(KEY_VALIDATION_TYPE, validation.getValidationType());
+		values.put(KEY_VALUE, validation.getValues());
+		values.put(KEY_ACTIVE, validation.getActive());
+		values.put(KEY_SEQID, validation.getSeqID());
+		
+		
+		db.insert(TABLE_VALIDATION, // table
+		        null, //nullColumnHack
+		        values); // key/value -> keys = column names/ values = column values
+    	
+    }
+    
+    
+    
+    
+    public void createDummyProperties(SQLiteDatabase db){
+    	 String selectQuery = "SELECT * FROM " + TABLE_PMA;
+    	 
+        // SQLiteDatabase db = this.getWritableDatabase();
+         cursor = db.rawQuery(selectQuery, null);
+
+         if(cursor.getCount() < 1){
+        	 this.insertIntoProperty(new Property("Prop1","GT","1",1),db);
+        	 this.insertIntoProperty(new Property("Prop2","AB","1",2),db);
+        	 this.insertIntoProperty(new Property("Prop3","CD","1",3),db);
+        	 this.insertIntoProperty(new Property("Prop4","EF","1",4),db);
+        	 this.insertIntoPMA(new PropertyMethodAssn("GT","Prop1","Temp1","Valid1",1),db);
+        	 this.insertIntoPMA(new PropertyMethodAssn("ZY","Prop2","Temp2","Valid1",2),db);
+        	 this.insertIntoPMA(new PropertyMethodAssn("LK","Prop3","Temp3","Valid2",3),db);
+        	 this.insertIntoPMA(new PropertyMethodAssn("RT","Prop4","Temp4","Valid3",4),db);
+        	 this.insertIntoMethod(new Method("Temp1","Desc1","1",1), db);
+        	 this.insertIntoMethod(new Method("Temp2","Desc2","1",2), db);
+        	 this.insertIntoMethod(new Method("Temp3","Desc3","1",3), db);
+        	 this.insertIntoMethod(new Method("Temp4","Desc4","1",4), db);        	 
+        	 this.insertIntoValidation(new Validation("Valid1","Descr5","categorical","hi`hello`voice","1",1),db);
+        	 this.insertIntoValidation(new Validation("Valid2","Descr6","ratio","1`9","1",2),db);
+        	 this.insertIntoValidation(new Validation("Valid3","Descr7","ratio","11`30","1",3),db);
+	 
+         }
+    	db.close();
+    	cursor.close();
+    }
+    
+    public String findValidationIDFromPMA(String PMAID){
+    	
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	String selectQuery = "SELECT * FROM " + TABLE_PMA + " WHERE " + KEY_PMAID + " = ?";
+    	String returnvalue = "";
+    	
+    	Cursor uCursor = db.rawQuery(selectQuery, new String[]{PMAID});
+    	
+    	if(uCursor != null){
+    		if (uCursor.moveToFirst()) {
+       		 do {
+       			 returnvalue = uCursor.getString(3);
+       		 } while (uCursor.moveToNext());
+       	 }
+    		
+    	}
+    	db.close();
+    	uCursor.close();
+    	return returnvalue;
+    }
+    
+    public String findValidationType(String validID){
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	String selectQuery = "SELECT * FROM " + TABLE_VALIDATION + " WHERE " + KEY_VALIDATIONID + " = ?";
+    	String returnvalue = "";	
+    	Cursor uCursor = db.rawQuery(selectQuery, new String[]{validID});
+    	
+    	if(uCursor != null){
+    		if (uCursor.moveToFirst()) {
+       		 do {
+       			 returnvalue = uCursor.getString(2);
+       		 } while (uCursor.moveToNext());
+       	 }
+    		
+    	}
+    	db.close();
+    	uCursor.close();
+    	
+    	return returnvalue;
+    	
+    	
+    	//2
+    }
+    public String[] getPossibleValues(String validID){
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	String selectQuery = "SELECT * FROM " + TABLE_VALIDATION + " WHERE " + KEY_VALIDATIONID + " = ?";
+    	String returnvalue = "";	
+    	
+    	Cursor uCursor = db.rawQuery(selectQuery, new String[]{validID});
+    	
+    	if(uCursor != null){
+    		if (uCursor.moveToFirst()) {
+       		 do {
+       			 returnvalue = uCursor.getString(3);
+       		 } while (uCursor.moveToNext());
+       	 }
+    		
+    	}
+    	db.close();
+    	uCursor.close();
+    	
+    	
+    	String[] values = returnvalue.split("`");
+    	return values;
     	
     	
     }
     
-    public void createDummyProperties(){
-    	 String selectQuery = "SELECT * FROM " + TABLE_PROPERTY;
-    	 
-        // SQLiteDatabase db = this.getWritableDatabase();
-         //cursor = db.rawQuery(selectQuery, null);
-
-        // if(cursor.getCount() < 1){
-        	 insertIntoProperty(new Property("GT","GT","1",1));
-        	 insertIntoProperty(new Property("AB","AB","1",2));
-        	 insertIntoProperty(new Property("CD","CD","1",3));
-        	 insertIntoProperty(new Property("EF","EF","1",4));
-        	 
-         //}
-    	//db.close();
-    }
+    
     
     
     public int countData(){
-  	 String selectQuery = "SELECT * FROM " + TABLE_PROPERTY;
+  	 String selectQuery = "SELECT * FROM " + TABLE_DATA;
     	 
      SQLiteDatabase db = this.getWritableDatabase();
      cursor = db.rawQuery(selectQuery, null);
@@ -362,7 +485,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public List<String> getAllLabelsProperty(){
     	 List<String> labels = new ArrayList<String>();
     	 
-    	 String selectQuery = "SELECT * FROM " + TABLE_PROPERTY;
+    	 String selectQuery = "SELECT * FROM " + TABLE_PMA;
     	 
     	 SQLiteDatabase db = this.getWritableDatabase();
          cursor = db.rawQuery(selectQuery, null);
@@ -370,7 +493,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
          if(cursor != null){
         	 if (cursor.moveToFirst()) {
         		 do {
-        			 labels.add(cursor.getString(1));
+        			 labels.add(cursor.getString(0));
         		 } while (cursor.moveToNext());
         	 }
          }

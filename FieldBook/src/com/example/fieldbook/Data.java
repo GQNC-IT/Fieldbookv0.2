@@ -19,12 +19,13 @@ public class Data {
 	}
 	
 	public Data(String DataID2, String PropertyMethodAssnID2, String Value2, String UserIDNo2,  
-			String DeviceID2, String Longitude2, String Latitude2, String Active2, String Blocked2, int SeqID2) {
+			String DateTime2, String DeviceID2, String Longitude2, String Latitude2, String Active2, String Blocked2, int SeqID2) {
     super();
     DataID = DataID2;
     PropertyMethodAssnID = PropertyMethodAssnID2;
     Value = Value2;
     UserIDNo = UserIDNo2;
+    DateTime = DateTime2;
     DeviceID = DeviceID2;
     Longitude = Longitude2;
     Latitude = Latitude2;  

@@ -52,6 +52,7 @@ import android.widget.Toast;
 public class LoginActivity extends ActionBarActivity {
 	boolean inTry;
 	 FileInputStream fis;
+	String username;
 	List<Map<String,String>> data = new ArrayList<Map<String,String>>();
 	Map<String, String> datum = new HashMap<String, String>(2);
 	
@@ -64,7 +65,8 @@ public class LoginActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_login);
 		loadActivity();
-		
+		Intent intent = getIntent();
+		username = intent.getStringExtra("username");
 		
 		/*if (savedInstanceState == null) {
 			getSupportFragmentManager().beginTransaction()
@@ -203,6 +205,7 @@ public class LoginActivity extends ActionBarActivity {
 	public void goDataCollection(String dbname){
 		Intent intent = new Intent(this, DataCollection.class);
 		intent.putExtra("dbName", dbname);
+		intent.putExtra("username", username);
 		startActivity(intent);
 		
 	}

@@ -43,7 +43,7 @@ public class SignupDisplayActivity extends ActionBarActivity {
 	    	
 	    	Log.i("TRACE", "umabot dito");
 	    	
-	    	db.addUser(new User(UserIDNo, Username, Password, FirstName, MiddleName, LastName, OrgUnitID));
+	    	db.addUser(new User(UserIDNo, Username, Password, FirstName, MiddleName, LastName, OrgUnitID,1));
 	    }catch(Exception e){
 	    	e.printStackTrace();
 	    }

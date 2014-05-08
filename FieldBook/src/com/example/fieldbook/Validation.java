@@ -8,17 +8,27 @@ public class Validation {
 	private String ValidationDescription;
     private String ValidationType;
     private String Values;
+    private String Active;
 	private int SeqID;
 		 
+	public String getActive() {
+		return Active;
+	}
+
+	public void setActive(String active) {
+		this.Active = active;
+	}
+
 	//constructors
 	public Validation(){}
 		 
-	public Validation(String ValidationID, String ValidationDescription, String ValidationType, String Values, int SeqID) {
+	public Validation(String ValidationID, String ValidationDescription, String ValidationType, String Values, String Active, int SeqID) {
 		super();
 		this.ValidationID = ValidationID;
         this.ValidationDescription = ValidationDescription;
         this.ValidationType = ValidationType;
         this.Values = Values;
+        this.Active = Active;
         this.SeqID = SeqID;
     }
 		 
