@@ -9,7 +9,7 @@ public class MySQLiteDataHelper extends SQLiteOpenHelper {
 	// Database Version
     private static final int DATABASE_VERSION = 1;
     // Database Name
-    private static String DATABASE_NAME = "DataObjectDB.db";
+    private static final String DATABASE_NAME = "DataObjectDB.db";
     //Table Name
     private static final String TABLE_DATA = "Data";
     //For Database declaration
@@ -35,31 +35,10 @@ public class MySQLiteDataHelper extends SQLiteOpenHelper {
 	public MySQLiteDataHelper(Context context) { // constructor
         super(context, DATABASE_NAME, null, DATABASE_VERSION);  
     }
-	
-	
-	public void createTable(){
-		String CREATE_DATA_TABLE = "CREATE TABLE if not exists Data ( " +
-                "DATA_DATAID TEXT PRIMARY KEY, " + 
-                "DATA_PROPERTYMETHODASSN TEXT, "+
-                "DATA_VALUE TEXT," +
-                "DATA_USERIDNO TEXT,"+
-                "DATA_DATETIME TEXT,"+
-                "DATA_DEVICEID TEXT,"+
-                "DATA_LONGITUDE TEXT,"+
-                "DATA_LATITUDE TEXT,"+
-                "DATA_ACTIVE TEXT," +
-                "DATA_BLOCKED TEXT," +
-                "DATA_SEQID INTEGER AUTOINCREMENT)";
-        //this.db1 = db; 
-        // create all the tables
-        db1.execSQL(CREATE_DATA_TABLE);
-		
-	}
-	
 	@Override
     public void onCreate(SQLiteDatabase db) {     
         // SQL statement to create Data table
-       /* String CREATE_DATA_TABLE = "CREATE TABLE if not exists Data ( " +
+        String CREATE_DATA_TABLE = "CREATE TABLE Data ( " +
                 "DATA_DATAID TEXT PRIMARY KEY, " + 
                 "DATA_PROPERTYMETHODASSN TEXT, "+
                 "DATA_VALUE TEXT," +
@@ -73,7 +52,7 @@ public class MySQLiteDataHelper extends SQLiteOpenHelper {
                 "DATA_SEQID INTEGER AUTOINCREMENT)";
         this.db1 = db; 
         // create all the tables
-        db.execSQL(CREATE_DATA_TABLE);*/
+        db.execSQL(CREATE_DATA_TABLE);
 	}
 	
 	@Override
@@ -94,10 +73,6 @@ public class MySQLiteDataHelper extends SQLiteOpenHelper {
     
     public String getDatabaseName(){
     	return DATABASE_NAME;
-    }
-    
-    public void setDatabaseName(String dbName){
-    	MySQLiteDataHelper.DATABASE_NAME = dbName;
     }
     
     public String[] getColHeads(){

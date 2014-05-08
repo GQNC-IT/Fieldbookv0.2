@@ -30,7 +30,7 @@ public class MySQLitePMAHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {     
 		// SQL statement to create Method table
 		// SQL statement to create PropertyMethodAssn table
-        String CREATE_PMA_TABLE = "CREATE TABLE if not exists PMA ( " +
+        String CREATE_PMA_TABLE = "CREATE TABLE PMA ( " +
                 "PMA_PROPERTYMETHODASSNID TEXT PRIMARY KEY, " + 
                 "PMA_PROPERTYID TEXT, "+
                 "PMA_METHODID TEXT," +

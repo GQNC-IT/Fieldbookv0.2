@@ -5,53 +5,53 @@ package com.example.fieldbook;
  */
 public class Property{
 		
-	private static String PropertyID;
-	private static String PropertyDescription;
-	private static String Active;
-	private static int SeqID;
+	private String PropertyID;
+	private String PropertyDescription;
+	private String Active;
+	private int SeqID;
 				 
 	//constructors
 	public Property(){}
 				 
-	public Property(String PropertyID2, String PropertyDescription2, String Active2, int SeqID2) {
+	public Property(String PropertyID, String PropertyDescription, String Active, int SeqID) {
 		super();
-		PropertyID = PropertyID2;
-		PropertyDescription = PropertyDescription2;
-		Active = Active2;
-		SeqID = SeqID2;
+		this.PropertyID = PropertyID;
+		this.PropertyDescription = PropertyDescription;
+		this.Active = Active;
+		this.SeqID = SeqID;
 	}
 				 
 		//getters & setters
-		public static String getPropertyID() {
+		public String getPropertyID() {
 			return PropertyID;
 		}
 				
-		public void setPropertyID(String PropertyID2) {
-			PropertyID = PropertyID2;
+		public void setPropertyID(String PropertyID) {
+			this.PropertyID = PropertyID;
 		}
 					      
-		public static String getPropertyDescription() {
+		public String getPropertyDescription() {
 			return PropertyDescription;
 		}
 				
-		public void setPropertyDescription(String PropertyDescription2) {
-			PropertyDescription = PropertyDescription2;
+		public void setPropertyDescription(String PropertyDescription) {
+			this.PropertyDescription = PropertyDescription;
 		}
 					      
-		public static String getActive() {
+		public String getActive() {
 			return Active;
 		}
 				
-		public void setActive(String Active2) {
-			Active = Active2;
+		public void setActive(String Active) {
+			this.Active = Active;
 		}
 					      
-		public static int getSeqID() {
+		public int getSeqID() {
 			return SeqID;
 		}
 				
-		public void setSeqID(int SeqID2) {
-			SeqID = SeqID2;
+		public void setSeqID(int SeqID) {
+			this.SeqID = SeqID;
 		}
 					 
 		@Override
