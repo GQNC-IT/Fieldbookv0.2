@@ -15,7 +15,7 @@ public class User {
 	}
 	
 	public User(String UserIDNo, String Username, String Password, String FirstName, String MiddleName, 
-				String LastName, String OrgUnitID){
+				String LastName, String OrgUnitID, int SeqID){
 		 super();
 	     this.UserIDNo = UserIDNo;
 	     this.Username = Username;
@@ -24,6 +24,7 @@ public class User {
 	     this.MiddleName = MiddleName;
 	     this.LastName = LastName;
 	     this.OrgUnitID = OrgUnitID;
+	     this.SeqID = SeqID;
 	}
 			
 			 

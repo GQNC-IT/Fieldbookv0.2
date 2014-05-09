@@ -54,7 +54,7 @@ public class MySQLiteUserHelper extends SQLiteOpenHelper {
                 " MiddleName TEXT ,"+
                 " LastName TEXT ,"+
                 " OrgUnitID TEXT ,"+
-                " SeqID INTEGER KEY AUTO_INCREMENT "+
+                " SeqID INTEGER"+
                 " )";
   
         this.db1 = db; 
@@ -75,12 +75,22 @@ public class MySQLiteUserHelper extends SQLiteOpenHelper {
     	return this.db1;
     }
     
+    public int countUsers(){
+     	 String selectQuery = "SELECT * FROM " + TABLE_USER;
+       	 
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        return cursor.getCount();
+       	
+       }
+    
     public void addUser(User User){
         //for logging
     	Log.d("addUser", User.toString()); 
 
     	// 1. get reference to writable DB
     	SQLiteDatabase db = this.getWritableDatabase();
+    	
     	Log.i("TRACE", "umabot dito");
     	// 2. create ContentValues to add key "column"/value
     	ContentValues values = new ContentValues();
@@ -91,6 +101,10 @@ public class MySQLiteUserHelper extends SQLiteOpenHelper {
 		values.put(USER_MIDDLENAME, User.getMiddleName()); 
 		values.put(USER_LASTNAME, User.getLastName());  
 		values.put(USER_ORGUNITID, User.getOrgUnitID());
+		
+		int numberUsers = countUsers() + 1;
+		values.put(USER_SEQID, numberUsers);
+		
 		// 3. insert
 		db.insert(TABLE_USER, // table
 		        null, //nullColumnHack
@@ -223,12 +237,29 @@ public class MySQLiteUserHelper extends SQLiteOpenHelper {
     	Cursor mCursor = db.rawQuery("SELECT * FROM " + TABLE_USER + " WHERE Username = ? AND Password = ?", new String[]{Username, Password});
     		if (mCursor != null) {
     			if(mCursor.getCount() > 0){
+    				mCursor.close();
     				return true;
     			}
     		}
+    		mCursor.close();
     		return false;
     }
     
+    public String getIDNoFromUsername(String username1){
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	String returnvalue = "";
+    	Cursor uCursor = db.rawQuery("SELECT * from " + TABLE_USER + " WHERE Username = ?", new String[]{username1});
+    	if(uCursor != null){
+    		if (uCursor.moveToFirst()) {
+       		 do {
+       			 returnvalue = uCursor.getString(7);
+       		 } while (uCursor.moveToNext());
+       	 }
+    		
+    	}
+    	uCursor.close();
+    	return returnvalue;
+    }
     public String getTableName(){
     	return TABLE_USER;
     }

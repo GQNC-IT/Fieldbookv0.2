@@ -23,17 +23,12 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.bluetooth.BluetoothAdapter;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -54,6 +49,7 @@ import android.widget.TextView;
 import android.widget.Toast;
   
 public class LoginActivity extends ActionBarActivity {
+<<<<<<< HEAD
 	
 	private static final int DISCOVER_DURATION = 300;
 	private static final int REQUEST_BLU = 1;
@@ -62,8 +58,11 @@ public class LoginActivity extends ActionBarActivity {
 	public static String[] namesOfFiles;
 	static Context context;
 	
+=======
+>>>>>>> a90eb8cb19573be5a8a3b89c3c22b58de06ebae8
 	boolean inTry;
 	 FileInputStream fis;
+	String username;
 	List<Map<String,String>> data = new ArrayList<Map<String,String>>();
 	Map<String, String> datum = new HashMap<String, String>(2);
 	
@@ -75,9 +74,9 @@ public class LoginActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_login);
-		context = this;
 		loadActivity();
-		
+		Intent intent = getIntent();
+		username = intent.getStringExtra("username");
 		
 		/*if (savedInstanceState == null) {
 			getSupportFragmentManager().beginTransaction()
@@ -86,6 +85,7 @@ public class LoginActivity extends ActionBarActivity {
 	}
 
 public void loadActivity(){
+		
 		
 		
 		File dir = new File("data/data/com.example.fieldbook/fieldbooks"); //Not dynamic yet
@@ -104,8 +104,11 @@ public void loadActivity(){
 		dir = new File("data/data/com.example.fieldbook/databases");
 		File[] filelist = dir.listFiles();
 		String[] namesOfFiles = new String[filelist.length];
+<<<<<<< HEAD
 		this.databaseNames = new String[filelist.length];
 		
+=======
+>>>>>>> a90eb8cb19573be5a8a3b89c3c22b58de06ebae8
 		String temp1;
 		
 		HashMap<String,String> item;
@@ -116,7 +119,10 @@ public void loadActivity(){
 		for (int i = 0; i < namesOfFiles.length; i++) {
 			if(!(filelist[i].getName().equals("DataObjectDB.db")) && !(filelist[i].getName().endsWith(".db-journal"))){
 				temp1 = filelist[i].getName();
+<<<<<<< HEAD
 				this.databaseNames[i] = filelist[i].getName();
+=======
+>>>>>>> a90eb8cb19573be5a8a3b89c3c22b58de06ebae8
 				   
 				  
 				  
@@ -150,7 +156,31 @@ public void loadActivity(){
 		new String[] { "line1","line2" },
 		new int[] {R.id.line_a, R.id.line_b});
 		listView.setAdapter( sa );
+<<<<<<< HEAD
 
+=======
+		//listView.setTextAlignment(4);
+
+		
+		
+		
+		//String[] values = new String[]{"A","B","C","D","E","F"};
+		
+		//int a = 1;
+		/*for (a = 1; a < values.length; a++){
+			values[a-1] = "Fieldbook" + a;
+			
+		}*/
+		
+		//ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,android.R.id.text1, namesOfFiles){};
+
+		
+
+		//listView.setAdapter(adapter);
+		
+		
+		
+>>>>>>> a90eb8cb19573be5a8a3b89c3c22b58de06ebae8
 		listView.setOnItemClickListener(new OnItemClickListener(){
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
@@ -173,6 +203,15 @@ public void loadActivity(){
              public boolean onItemLongClick(AdapterView<?> parent, View view,
                 int position, long id) {
                
+<<<<<<< HEAD
+=======
+              // ListView Clicked item index
+              //int itemPosition     = position;
+              
+              // ListView Clicked item value
+             //	 TextView clickedView = (TextView) view;
+            //	 String itemValue = (String) clickedView.getText();
+>>>>>>> a90eb8cb19573be5a8a3b89c3c22b58de06ebae8
              TextView textView = (TextView) view.findViewById(R.id.line_a);
              String itemValue = (String) textView.getText();
              renamePrompt(itemValue);
@@ -189,6 +228,10 @@ public void loadActivity(){
 	public void goDataCollection(String dbname){
 		Intent intent = new Intent(this, DataCollection.class);
 		intent.putExtra("dbName", dbname);
+<<<<<<< HEAD
+=======
+		intent.putExtra("username", username);
+>>>>>>> a90eb8cb19573be5a8a3b89c3c22b58de06ebae8
 		startActivity(intent);
 		
 	}
@@ -273,6 +316,7 @@ public void loadActivity(){
 		File[] filelist = dir.listFiles();
 		LinkedList<String> names = new LinkedList<String>();
 		
+<<<<<<< HEAD
 		AlertDialog.Builder builder=new AlertDialog.Builder(LoginActivity.context);
 		builder.setTitle("Which to share?");
 		
@@ -327,6 +371,41 @@ public void loadActivity(){
 						cursor.moveToNext();
 					}
 					
+=======
+		Toast toast = Toast.makeText(getApplicationContext(), "Excel file has been made", Toast.LENGTH_SHORT);
+		toast.show();
+		String sdCard = Environment.getExternalStorageDirectory().getPath();
+		File directory = new File (sdCard + "/excelfiles");
+		
+		Log.i("Excel",sdCard+ "/excelfiles");
+		
+		directory.mkdirs();
+		
+		MySQLiteUserHelper dbHelper = new MySQLiteUserHelper(this);
+		SQLiteDatabase db = openOrCreateDatabase("UserDB.db", MODE_PRIVATE, null);
+		Cursor cursor = db.rawQuery("select * from users", null);
+	//	int rowCount = cursor.getCount();
+		if(cursor != null)
+			cursor.moveToFirst();
+		
+		String[] colHeads = dbHelper.getColHeads(); 
+		
+		try{
+			WritableWorkbook workbook = Workbook.createWorkbook(new File(directory, "ExcelFile-0.1.xls"));
+			WritableSheet worksheet = workbook.createSheet("users", 0);
+			int colCount = cursor.getColumnCount();
+			for(int i = 0; i < colCount; i++){
+				Label label = new Label(i, 0, colHeads[i]);
+				worksheet.addCell(label);
+			}
+			
+			int rows = 0;
+			cursor.moveToFirst();
+			while(cursor.isAfterLast() == false){
+				rows++;
+				for(int i = 0; i < colCount; i++){
+					Label label = new Label(i, rows, cursor.getString(i));
+>>>>>>> a90eb8cb19573be5a8a3b89c3c22b58de06ebae8
 					
 					cursor.close();
 					workbook.write();
@@ -338,10 +417,22 @@ public void loadActivity(){
 				}
 				
 			}
+<<<<<<< HEAD
 		});
 		AlertDialog b = builder.create();
 		b.show();
 		
+=======
+			
+			
+			cursor.close();
+			workbook.write();
+			workbook.close();
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+>>>>>>> a90eb8cb19573be5a8a3b89c3c22b58de06ebae8
 	}
 	
 	public void generateTSV(View view){
@@ -350,6 +441,7 @@ public void loadActivity(){
 		String[] namesOfFiles;
 		LinkedList<String> names = new LinkedList<String>();
 		
+<<<<<<< HEAD
 		AlertDialog.Builder builder=new AlertDialog.Builder(LoginActivity.context);
 		builder.setTitle("Which to share?");
 		
@@ -379,12 +471,40 @@ public void loadActivity(){
 				
 				Toast.makeText(LoginActivity.context, "Clicked TSV Generation", Toast.LENGTH_LONG).show();
 				
+=======
+		MySQLiteUserHelper dbHelper = new MySQLiteUserHelper(this);
+		SQLiteDatabase db = openOrCreateDatabase("UserDB.db", MODE_PRIVATE, null);
+		Cursor cursor = db.rawQuery("select * from users", null);
+//		int rowCount = cursor.getCount();
+		if(cursor != null)
+			cursor.moveToFirst();
+		
+		String[] colHeads = dbHelper.getColHeads(); 
+		
+		try{
+			File tsvFile = new File(directory, "TSVFile-0.1.txt");
+			BufferedWriter bw = new BufferedWriter(new FileWriter(tsvFile));
+			
+			int colCount = cursor.getColumnCount();
+			for(int i = 0; i < colCount; i++){
+				bw.write(colHeads[i]+"\t");
+			}
+			bw.write("\n");
+			cursor.moveToFirst();
+			while(cursor.isAfterLast() == false){
+				for(int i = 0; i < colCount; i++){
+					bw.write(cursor.getString(i)+"\t");
+				}
+				bw.write("\n");
+				cursor.moveToNext();
+>>>>>>> a90eb8cb19573be5a8a3b89c3c22b58de06ebae8
 			}
 		});
 		AlertDialog b = builder.create();
 		b.show();
 	}
 	
+<<<<<<< HEAD
 	public void fileSetter(File directory, String filename){
 		this.fp = new File(directory, filename); 
 	}
@@ -536,6 +656,8 @@ public void loadActivity(){
 		alertDialog.show();
 	}
 	
+=======
+>>>>>>> a90eb8cb19573be5a8a3b89c3c22b58de06ebae8
 	public void reappear(){
 		Intent intent = new Intent(this,LoginActivity.class);
 		startActivity(intent);
@@ -561,7 +683,11 @@ public void loadActivity(){
 	//	int id = item.getItemId();
 		switch (item.getItemId()) {
 		case R.id.action_share:
+<<<<<<< HEAD
 			final String [] items=new String []{"Bluetooth", "Email"};
+=======
+			final String [] items=new String []{"Excel","Tab Separated File"};
+>>>>>>> a90eb8cb19573be5a8a3b89c3c22b58de06ebae8
 			AlertDialog.Builder builder=new AlertDialog.Builder(this);
 			builder.setTitle("Sharing options");
 
@@ -571,10 +697,17 @@ public void loadActivity(){
 			public void onClick(DialogInterface dialog, int which) {
 			// TODO Auto-generated method stub
 				if(which == 0){
+<<<<<<< HEAD
 					transferBT(new View(getApplicationContext()));
 				}
 				else if(which == 1){
 					sendEmail(new View(getApplicationContext()));
+=======
+					generateXLS(new View(getApplicationContext()));
+				}
+				else if(which == 1){
+					generateTSV(new View(getApplicationContext()));
+>>>>>>> a90eb8cb19573be5a8a3b89c3c22b58de06ebae8
 				}
 			}
 			});
