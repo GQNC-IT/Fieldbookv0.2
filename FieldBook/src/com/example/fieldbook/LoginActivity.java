@@ -4,13 +4,12 @@
 
 package com.example.fieldbook;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,8 +57,9 @@ public class LoginActivity extends ActionBarActivity {
 	
 	private static final int DISCOVER_DURATION = 300;
 	private static final int REQUEST_BLU = 1;
-	public File fp = new File(Environment.getExternalStorageDirectory().getPath() + "/excelfiles", "sampleDB.xls");
+	public File fp = new File(Environment.getExternalStorageDirectory().getPath().toString() + "/excelfiles", "sampleDB.xls");
 	String[] databaseNames;
+	public static String[] namesOfFiles;
 	static Context context;
 	
 	boolean inTry;
@@ -85,7 +85,8 @@ public class LoginActivity extends ActionBarActivity {
 		}*/
 	}
 
-	public void loadActivity(){
+public void loadActivity(){
+		
 		
 		File dir = new File("data/data/com.example.fieldbook/fieldbooks"); //Not dynamic yet
 		if(!(dir.isDirectory())){
@@ -99,9 +100,12 @@ public class LoginActivity extends ActionBarActivity {
 			}
 			
 		}
+		
+		dir = new File("data/data/com.example.fieldbook/databases");
 		File[] filelist = dir.listFiles();
 		String[] namesOfFiles = new String[filelist.length];
-		this.databaseNames =  new String[filelist.length];
+		this.databaseNames = new String[filelist.length];
+		
 		String temp1;
 		
 		HashMap<String,String> item;
@@ -110,36 +114,32 @@ public class LoginActivity extends ActionBarActivity {
 		String md5 = "";
 		
 		for (int i = 0; i < namesOfFiles.length; i++) {
-			   temp1 = filelist[i].getName();
-			   databaseNames[i] = filelist[i].getName();
-			  
-			  
-			try {
-				fis = new FileInputStream(new File("data/data/com.example.fieldbook/fieldbooks" + "/" + temp1));
-				md5 = new String(Hex.encodeHex(DigestUtils.md5(temp1)));
-				inTry = true;
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(!(filelist[i].getName().equals("DataObjectDB.db")) && !(filelist[i].getName().endsWith(".db-journal"))){
+				temp1 = filelist[i].getName();
+				this.databaseNames[i] = filelist[i].getName();
+				   
+				  
+				  
+				try {
+					fis = new FileInputStream(new File("data/data/com.example.fieldbook/databases" + "/" + temp1));
+					md5 = new String(Hex.encodeHex(DigestUtils.md5(temp1)));
+					inTry = true;
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		 
+				   namesOfFiles[i] = temp1.replaceAll(".db$","");
+
+				   item = new HashMap<String,String>();
+				   item.put( "line1", namesOfFiles[i]);
+				   item.put( "line2", md5);
+				   list.add( item );
+
+				   inTry = false;
 			}
 			   
-			   
-			   namesOfFiles[i] = temp1.replaceAll(".db$","");
-			  // if(inTry){
-			//	   namesOfFiles[i] = namesOfFiles[i] + "\n" + md5;
-			  // }
-			   
-			   item = new HashMap<String,String>();
-			   item.put( "line1", namesOfFiles[i]);
-			   item.put( "line2", md5);
-			   list.add( item );
 
-			   
-			   
-			   inTry = false;
-			   //datum.put("First Line",namesOfFiles[i]);
-			   //datum.put("Second Line",md5);
-			   //data.add(datum);
 		}
 		
 		
@@ -150,14 +150,17 @@ public class LoginActivity extends ActionBarActivity {
 		new String[] { "line1","line2" },
 		new int[] {R.id.line_a, R.id.line_b});
 		listView.setAdapter( sa );
-		
+
 		listView.setOnItemClickListener(new OnItemClickListener(){
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-			Toast.makeText(getApplicationContext(),
+			/*Toast.makeText(getApplicationContext(),
 	                 "Item clicked", Toast.LENGTH_LONG)
-	                 .show();
-			goDataCollection();
+	                 .show();*/
+			TextView textView = (TextView) view.findViewById(R.id.line_a);
+            String itemValue = (String) textView.getText();
+            
+			goDataCollection(itemValue);
 			}
 	
 		});
@@ -169,13 +172,10 @@ public class LoginActivity extends ActionBarActivity {
            //  @Override
              public boolean onItemLongClick(AdapterView<?> parent, View view,
                 int position, long id) {
+               
              TextView textView = (TextView) view.findViewById(R.id.line_a);
              String itemValue = (String) textView.getText();
-             //String  itemValue    = (String) listView.getItemAtPosition(position);
-                 
-               // Show Alert 
-              
-              renamePrompt(itemValue);
+             renamePrompt(itemValue);
               
               return true;
             
@@ -186,8 +186,9 @@ public class LoginActivity extends ActionBarActivity {
 	}
 	
 	
-	public void goDataCollection(){
+	public void goDataCollection(String dbname){
 		Intent intent = new Intent(this, DataCollection.class);
+		intent.putExtra("dbName", dbname);
 		startActivity(intent);
 		
 	}
@@ -220,8 +221,8 @@ public class LoginActivity extends ActionBarActivity {
 	}
 	
 	public void reNaming(String oldstring, String newstring){
-		File file = new File("data/data/com.example.fieldbook/fieldbooks/" + oldstring + ".db");
-		File file2 = new File("data/data/com.example.fieldbook/fieldbooks/" + newstring + ".db");
+		File file = new File("data/data/com.example.fieldbook/databases/" + oldstring + ".db");
+		File file2 = new File("data/data/com.example.fieldbook/databases/" + newstring + ".db");
 		boolean success = file.renameTo(file2);
 		if(success){
 			Toast.makeText(getApplicationContext(),
@@ -245,7 +246,7 @@ public class LoginActivity extends ActionBarActivity {
 		builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 			  String value = input.getText().toString();
-			  File file = new File("data/data/com.example.fieldbook/fieldbooks/" + value + ".db");
+			  File file = new File("data/data/com.example.fieldbook/databases/" + value + ".db");
 			  try {
 				if (file.createNewFile()){
 				        System.out.println("File is created!");
@@ -267,136 +268,121 @@ public class LoginActivity extends ActionBarActivity {
 	}
 	
 	public void generateXLS(View view){
+
+		File dir = new File("data/data/com.example.fieldbook/databases");
+		File[] filelist = dir.listFiles();
+		LinkedList<String> names = new LinkedList<String>();
 		
-		String sdCard = Environment.getExternalStorageDirectory().getPath();
-		File directory = new File (sdCard + "/excelfiles");
-		
-		Log.i("Excel",sdCard+ "/excelfiles");
-		
-		directory.mkdirs();
-		
-		
-		final String [] items = this.databaseNames;
-		AlertDialog.Builder builder=new AlertDialog.Builder(this);
+		AlertDialog.Builder builder=new AlertDialog.Builder(LoginActivity.context);
 		builder.setTitle("Which to share?");
 		
-		builder.setItems(items, new OnClickListener() {
+		String [] tokens;
+		for(int i = 0; i < filelist.length; i++){
+			if(filelist[i].getName().endsWith(".db")){
+				tokens = filelist[i].getName().split("/");
+				names.add(tokens[tokens.length-1]);
+			}
+		}
+		namesOfFiles = new String[names.size()];
+		for(int i=0;i<names.size();i++){
+			namesOfFiles[i] = names.get(i);
+		}
+		
+		builder.setItems(namesOfFiles, 
+		new OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
+
+				Toast.makeText(LoginActivity.context, "Clicked Excel Generation", Toast.LENGTH_SHORT).show();
+				
 				String sdCard = Environment.getExternalStorageDirectory().getPath();
-				File directory = new File (sdCard + "/BTFiles");	
-				String extended = databaseNames[which];
-				String[] filename = extended.split(".");
-				fileSetter(directory, filename[0]+".xls");
-				Toast.makeText(null, "File set", Toast.LENGTH_SHORT).show();
+				File directory = new File (sdCard + "/excelfiles");
+				
+				MySQLiteDataHelper dataHelper = new MySQLiteDataHelper(LoginActivity.context);
+				SQLiteDatabase db = openOrCreateDatabase(dataHelper.getDBName(), MODE_PRIVATE, null);
+				Cursor cursor = db.rawQuery("select * from "+dataHelper.getTableName(), null);
+				String[] colHeads;
+				if(cursor != null)
+					cursor.moveToFirst();
+	
+				colHeads = dataHelper.getColHeads();
+				
+				try{
+					WritableWorkbook workbook = Workbook.createWorkbook(new File(directory, LoginActivity.namesOfFiles[which]));
+					WritableSheet worksheet = workbook.createSheet(dataHelper.getTableName(), 0);
+					int colCount = cursor.getColumnCount();
+					for(int i = 0; i < colCount; i++){
+						Label label = new Label(i, 0, colHeads[i]);
+						worksheet.addCell(label);
+					}
+					
+					int rows = 0;
+					cursor.moveToFirst();
+					while(cursor.isAfterLast() == false){
+						rows++;
+						for(int i = 0; i < colCount; i++){
+							Label label = new Label(i, rows, cursor.getString(i));
+							
+							worksheet.addCell(label);
+						}
+						cursor.moveToNext();
+					}
+					
+					
+					cursor.close();
+					workbook.write();
+					workbook.close();
+					Toast toast = Toast.makeText(getApplicationContext(), "Excel file has been made", Toast.LENGTH_SHORT);
+					toast.show();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				
 			}
 		});
-
-		builder.show();
-		
-		MySQLiteUserHelper dbHelper = new MySQLiteUserHelper(this);
-		SQLiteDatabase db = openOrCreateDatabase("puta.db", MODE_PRIVATE, null);
-		Cursor cursor = db.rawQuery("select * from users", null);
-		//	int rowCount = cursor.getCount();
-		if(cursor != null)
-			cursor.moveToFirst();
-		
-		String[] colHeads = dbHelper.getColHeads(); 
-		
-		
-		try{
-			WritableWorkbook workbook = Workbook.createWorkbook(this.fp);
-			WritableSheet worksheet = workbook.createSheet("users", 0);
-			int colCount = cursor.getColumnCount();
-			for(int i = 0; i < colCount; i++){
-				Label label = new Label(i, 0, colHeads[i]);
-				worksheet.addCell(label);
-			}
-			
-			int rows = 0;
-			cursor.moveToFirst();
-			while(cursor.isAfterLast() == false){
-				rows++;
-				for(int i = 0; i < colCount; i++){
-					Label label = new Label(i, rows, cursor.getString(i));
-					
-					worksheet.addCell(label);
-				}
-				cursor.moveToNext();
-			}
-			
-			
-			cursor.close();
-			workbook.write();
-			workbook.close();
-			Toast toast = Toast.makeText(getApplicationContext(), "Excel file has been made", Toast.LENGTH_SHORT);
-			toast.show();
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+		AlertDialog b = builder.create();
+		b.show();
 		
 	}
 	
 	public void generateTSV(View view){
-
-		String sdCard = Environment.getExternalStorageDirectory().getPath();
-		File directory = new File (sdCard + "/tsvfiles");
+		File dir = new File("data/data/com.example.fieldbook/databases");
+		File[] filelist = dir.listFiles();
+		String[] namesOfFiles;
+		LinkedList<String> names = new LinkedList<String>();
 		
-		Log.i("Excel",sdCard+ "/tsvfiles");
-		
-		directory.mkdirs();
-		
-		final String [] items = this.databaseNames;
-		AlertDialog.Builder builder=new AlertDialog.Builder(this);
+		AlertDialog.Builder builder=new AlertDialog.Builder(LoginActivity.context);
 		builder.setTitle("Which to share?");
 		
-		builder.setItems(items, new OnClickListener() {
+		String [] tokens;
+		for(int i = 0; i < filelist.length; i++){
+			if(filelist[i].getName().endsWith(".db")){
+				tokens = filelist[i].getName().split("/");
+				names.add(tokens[tokens.length-1]);
+			}
+		}
+		namesOfFiles = new String[names.size()];
+		for(int i=0;i<names.size();i++){
+			namesOfFiles[i] = names.get(i);
+		}
+		
+		builder.setItems(namesOfFiles, 
+		new OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
+				/*
 				String sdCard = Environment.getExternalStorageDirectory().getPath();
-				File directory = new File (sdCard + "/BTFiles");		
+				File directory = new File (sdCard + "/excelfiles");	
 				String extended = databaseNames[which];
 				String[] filename = extended.split(".");
-				fileSetter(directory, filename[0]+".tsv");
-				Toast.makeText(null, "File set", Toast.LENGTH_SHORT).show();
+				fileSetter(directory, filename[0]+".xls");
+				Toast.makeText(LoginActivity.context, "File set", Toast.LENGTH_SHORT).show();
+				*/
+				
+				Toast.makeText(LoginActivity.context, "Clicked TSV Generation", Toast.LENGTH_LONG).show();
+				
 			}
 		});
-
-		builder.show();
-		
-		MySQLiteUserHelper dbHelper = new MySQLiteUserHelper(this);
-		SQLiteDatabase db = openOrCreateDatabase(fp.getName(), MODE_PRIVATE, null);
-		Cursor cursor = db.rawQuery("select * from users", null);
-//		int rowCount = cursor.getCount();
-		if(cursor != null)
-			cursor.moveToFirst();
-		
-		String[] colHeads = dbHelper.getColHeads(); 
-				
-		try{
-			File tsvFile = this.fp;
-			BufferedWriter bw = new BufferedWriter(new FileWriter(tsvFile));
-			
-			int colCount = cursor.getColumnCount();
-			for(int i = 0; i < colCount; i++){
-				bw.write(colHeads[i]+"\t");
-			}
-			bw.write("\n");
-			cursor.moveToFirst();
-			while(cursor.isAfterLast() == false){
-				for(int i = 0; i < colCount; i++){
-					bw.write(cursor.getString(i)+"\t");
-				}
-				bw.write("\n");
-				cursor.moveToNext();
-			}
-			cursor.close();
-			bw.flush();
-			bw.close();
-			
-			Toast toast = Toast.makeText(getApplicationContext(), "TSV File made", Toast.LENGTH_SHORT);
-			toast.show();
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+		AlertDialog b = builder.create();
+		b.show();
 	}
 	
 	public void fileSetter(File directory, String filename){
@@ -519,7 +505,7 @@ public class LoginActivity extends ActionBarActivity {
 	        	   SQLiteDatabase db = openOrCreateDatabase("puta.db", MODE_PRIVATE, null);
 	        	   Cursor cursor = db.rawQuery("select * from users", null);
 */	        	   
-	        	   String from = "jeobmallari@gmail.com";
+	        	   String from = "gerbene5@gmail.com";
 //	        	   EditText bodyET = (EditText) findViewById(R.id.body);
 	        	   //String body = bodyET.getText().toString();
 	        	   String body = "";	// email body
@@ -575,11 +561,32 @@ public class LoginActivity extends ActionBarActivity {
 	//	int id = item.getItemId();
 		switch (item.getItemId()) {
 		case R.id.action_share:
-			final String [] items=new String []{"Excel","Tab Separated File", "Bluetooth", "Email"};
+			final String [] items=new String []{"Bluetooth", "Email"};
 			AlertDialog.Builder builder=new AlertDialog.Builder(this);
-			builder.setTitle("Items alert");
+			builder.setTitle("Sharing options");
 
 			builder.setItems(items, new OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+			// TODO Auto-generated method stub
+				if(which == 0){
+					transferBT(new View(getApplicationContext()));
+				}
+				else if(which == 1){
+					sendEmail(new View(getApplicationContext()));
+				}
+			}
+			});
+
+			builder.show();
+            return true;
+		case R.id.action_import_export:
+			final String [] items1=new String []{"Excel File", "Tab Separated File", "New Fieldbook"};
+			AlertDialog.Builder builder1=new AlertDialog.Builder(this);
+			builder1.setTitle("Import/Export");
+
+			builder1.setItems(items1, new OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -591,18 +598,11 @@ public class LoginActivity extends ActionBarActivity {
 					generateTSV(new View(getApplicationContext()));
 				}
 				else if(which == 2){
-					transferBT(new View(getApplicationContext()));
-				}
-				else if(which == 3){
-					sendEmail(new View(getApplicationContext()));
+					// new fieldbook code here
 				}
 			}
 			});
-
-			builder.show();
-            return true;
-		case R.id.action_import_export:
-            //logout();
+			builder1.show();
             return true;
         case R.id.action_logout:
             logOut();

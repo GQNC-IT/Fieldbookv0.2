@@ -71,8 +71,8 @@ public class MySQLiteDataHelper extends SQLiteOpenHelper {
     	return TABLE_DATA;
     }
     
-    public String getDatabaseName(){
-    	return DATABASE_NAME;
+    public String getDBName(){
+    	return this.DATABASE_NAME;
     }
     
     public String[] getColHeads(){
